@@ -14,19 +14,12 @@ def ping(s):
         sys.stdout.write('.')
         sys.stdout.flush()
 
-print 'single open: ',
-s = Serial('/dev/ttyACM0')
-for i in range(10):
-        ping(s)
-s.close()
-
-print
-print 'multiple open: ',
 count = 0
 while True:
         s = Serial('/dev/ttyACM0')
         ping(s)
         #sys.stdout.write('%d\r' % count)
+        #sys.stdout.flush()
         count += 1
         sleep(1)
         s.close()
