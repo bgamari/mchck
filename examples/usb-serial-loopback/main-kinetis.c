@@ -13,8 +13,6 @@ new_data(uint8_t *data, size_t len)
 {
         if (ready) {
                 onboard_led(-1);
-                //cdc_write(data, len, &cdc);
-
                 ready = false;
                 pending += sizeof(hello);
                 size_t sent = cdc_write(hello, sizeof(hello), &cdc);
