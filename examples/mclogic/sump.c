@@ -183,7 +183,7 @@ PORTD_Handler(void)
 	int_disable(IRQ_PORTD);
 	uint32_t i;
 	for (i = 0; i < NUM_PROBES; i++) {
-		pin_physport_from_pin(PIN_PTD0 + i)->pcr[pin_physpin_from_pin(PIN_PTD0 + i)].isf |= 1;
+		pin_physport_from_pin(PIN_PTD0 + i)->pcr[pin_physpin_from_pin(PIN_PTD0 + i)].isf = 1;
 	}
 	start_sampling();
 }
