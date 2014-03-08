@@ -23,9 +23,6 @@ enum sump_cmd_t {
 /* entire PORTD */
 #define NUM_PROBES 8
 
-/* sysclock/CLK_SCALING = mclogic max samplerate */
-#define CLK_SCALING 12
-
 /* TODO read it from the mcu */
 #define SYSCLK_SCALING 48
 
@@ -157,13 +154,13 @@ start_sampling()
 	dma_to(DMA_CH_0, buffer, 1, DMA_TRANSFER_SIZE_8_BIT, 0, 0);
 	dma_to_addr_adj(DMA_CH_0, 0);
 	/* configure the timer according to our divider and clk. handler is not required. */
-	pit_start(PIT_0, (ctx.divider * CLK_SCALING) - 1, NULL);
+	pit_start(PIT_0, ctx.divider - 1, NULL);
 	/* dma has to be set to a "always on" source because PIT gates it */
 	dma_start(DMA_CH_0, DMA_MUX_SRC_ALWAYS0, 1, dma_handler);
 #else
-	if ((ctx.divider * CLK_SCALING) < BUSYLOOP_THRESHOLD) {
+	if (ctx.divider < BUSYLOOP_THRESHOLD) {
 		/* configure the timer according to our divider and clk. handler is not required. */
-		pit_start(PIT_0, (ctx.divider * CLK_SCALING) - 1, NULL);
+		pit_start(PIT_0, ctx.divider - 1, NULL);
 		while (buf_pos < ctx.read_count) {
 			buffer[buf_pos++] = (uint8_t)GPIOD.pdir;
 			while (!PIT.timer[PIT_0].tflg.tif);
@@ -174,7 +171,7 @@ start_sampling()
 		buf_pos = ctx.write(buffer, ctx.read_count);
 	} else {
 		/* configure the timer according to our divider and clk */
-		pit_start(PIT_0, (ctx.divider * CLK_SCALING) - 1, pit_handler_sample);
+		pit_start(PIT_0, ctx.divider - 1, pit_handler_sample);
 	}
 #endif
 }
@@ -303,7 +300,9 @@ sump_process(uint8_t* data, size_t len)
 		break;
 	case SUMP_CMD_SET_DIVIDER:
 		ctx.divider = ((struct divider_t*)data)->value;
-		ctx.divider = (ctx.divider + 1) / ((SYSCLK_SCALING * 100) / CLK_SCALING); // 100MHz = default OLS clk mult.
+		//unsigned int freq = 100 / (ctx.divider + 1);
+		//ctx.divider = SYSCLK_SCALING / freq; // 100MHz = default OLS clk mult.
+		ctx.divider = (ctx.divider + 1) * SYSCLK_SCALING / 100;
 		if (!ctx.divider)
 			ctx.divider = 1;
 		break;
