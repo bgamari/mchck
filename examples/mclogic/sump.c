@@ -183,7 +183,7 @@ PORTD_Handler(void)
 	int_disable(IRQ_PORTD);
 	uint32_t i;
 	for (i = 0; i < NUM_PROBES; i++) {
-		pin_physport_from_pin(PIN_PTD0 + i)->pcr[pin_physpin_from_pin(PIN_PTD0 + i)].raw |= 0;
+		pin_physport_from_pin(PIN_PTD0 + i)->pcr[pin_physpin_from_pin(PIN_PTD0 + i)].isf |= 1;
 	}
 	start_sampling();
 }
@@ -230,6 +230,8 @@ sump_init(sump_writer *w)
 	gpio_dir(PIN_PTD5, GPIO_INPUT);
 	gpio_dir(PIN_PTD6, GPIO_INPUT);
 	gpio_dir(PIN_PTD7, GPIO_INPUT);
+	for (unsigned int i=0; i<8; i++)
+		pin_mode(PIN_PTD0+i, PIN_MODE_MUX_GPIO);
 
 	pit_init();
 #ifdef MCLOGIC_DMA
