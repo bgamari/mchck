@@ -166,12 +166,8 @@ start_sampling()
 		pit_start(PIT_0, (ctx.divider * CLK_SCALING) - 1, NULL);
 		while (buf_pos < ctx.read_count) {
 			buffer[buf_pos++] = (uint8_t)GPIOD.pdir;
-			volatile uint32_t v;
-			for (;;) {
-				v = PIT.timer[PIT_0].cval;
-				if (v < PIT.timer[PIT_0].cval)
-					break;
-			}
+			while (!PIT.timer[PIT_0].tflg.tif);
+			PIT.timer[PIT_0].tflg.tif = 1;
 		}
 		onboard_led(ONBOARD_LED_OFF);
 		pit_stop(PIT_0);
