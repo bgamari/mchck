@@ -198,7 +198,7 @@ sump_arm()
 	if (/*ctx.trigger_cfg.serial &&*/ ctx.trigger_mask != 0) {
 		uint32_t mask, i;
 		for (i = 0; i < NUM_PROBES; i++) {
-			mask = i << 1; /* used to check if the port is used as trigger and its value */
+			mask = 1 << i; /* used to check if the port is used as trigger and its value */
 			enum PCR_IRQC_t irqc;
 			if (ctx.trigger_mask & mask) {
 				irqc = ctx.trigger & mask ? PCR_IRQC_INT_ONE : PCR_IRQC_INT_ZERO;
